@@ -375,6 +375,13 @@ if not os.path.exists("static"):
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":
-    import uvicorn
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    # Check if we are running inside Streamlit
+    import sys
+    is_streamlit = "streamlit" in sys.modules or (len(sys.argv) > 1 and sys.argv[1] == "run")
+    
+    if not is_streamlit:
+        import uvicorn
+        port = int(os.environ.get("PORT", 8000))
+        uvicorn.run(app, host="0.0.0.0", port=port)
+    else:
+        logger.info("Running within Streamlit environment, FastAPI uvicorn skipped.")
