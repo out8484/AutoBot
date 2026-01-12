@@ -253,6 +253,14 @@ async def get_scan_status():
         "results": current_scan_results
     }
 
+@app.get("/api/ping/{ip}")
+async def manual_ping(ip: str):
+    latency = ping(ip, timeout=1.0)
+    if latency is not None:
+        return {"status": "success", "latency": f"{latency*1000:.2f}ms"}
+    else:
+        return {"status": "error", "message": "Request timed out"}
+
 @app.get("/api/credentials")
 async def get_creds():
     return load_credentials()
@@ -368,4 +376,5 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)

@@ -125,17 +125,63 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateTable(results) {
-        scanResultsBody.innerHTML = results.map(res => `
+        scanResultsBody.innerHTML = results.map(res => {
+            const isAvailable = res.status === 'Available';
+            return `
             <tr>
                 <td><span class="status-badge ${res.status.toLowerCase()}">${res.status}</span></td>
-                <td>${res.ip}</td>
+                <td><a href="#" class="ip-link" onclick="openActionModal(event, '${res.ip}')">${res.ip}</a></td>
                 <td>${res.mac}</td>
                 <td>${res.latency}</td>
                 <td>${res.ports.join(', ') || 'None'}</td>
                 <td style="font-size: 0.8rem; color: #64748b">${res.last_seen}</td>
+                <td style="text-align: center;">
+                    ${isAvailable ? `<input type="checkbox" class="ip-selector-cb" data-ip="${res.ip}" onchange="syncSelectedIps()">` : '-'}
+                </td>
             </tr>
-        `).join('');
+        `}).join('');
     }
+
+    const actionModal = document.getElementById('action-modal');
+    const pingResultBox = document.getElementById('ping-result');
+    let currentActionIp = '';
+
+    window.openActionModal = (e, ip) => {
+        e.preventDefault();
+        currentActionIp = ip;
+        document.getElementById('action-ip-title').innerText = ip;
+        document.getElementById('action-ssh').href = `ssh://${ip}`;
+        document.getElementById('action-telnet').href = `telnet://${ip}`;
+        pingResultBox.classList.add('hidden');
+        actionModal.classList.remove('hidden');
+    };
+
+    document.getElementById('close-action-modal').onclick = () => actionModal.classList.add('hidden');
+
+    document.getElementById('action-ping').onclick = async () => {
+        pingResultBox.innerText = 'Ping in progress...';
+        pingResultBox.classList.remove('hidden');
+        try {
+            const res = await fetch(`/api/ping/${currentActionIp}`);
+            const data = await res.json();
+            if (data.status === 'success') {
+                pingResultBox.innerHTML = `<span style="color: var(--accent-green)">Success: ${data.latency}</span>`;
+            } else {
+                pingResultBox.innerHTML = `<span style="color: #ef4444">${data.message}</span>`;
+            }
+        } catch (err) {
+            pingResultBox.innerText = 'Error: ' + err.message;
+        }
+    };
+
+    window.syncSelectedIps = () => {
+        const selected = Array.from(document.querySelectorAll('.ip-selector-cb:checked'))
+            .map(cb => cb.getAttribute('data-ip'));
+        const targetInput = document.getElementById('ssh-target-ip');
+        if (targetInput) {
+            targetInput.value = selected.join(', ');
+        }
+    };
 
     // Dashboard Updates
     function updateDashboard() {
