@@ -54,7 +54,7 @@ pip install -r requirements.txt
 ```bash
 python3 main.py
 ```
-서버는 기본적으로 `http://0.0.0.0:8000`에서 활성화됩니다.
+서버는 기본적으로 `http://0.0.0.0:8000`에서 활성화됩니다. 클라우드 배포(Streamlit, Heroku 등) 시에는 `PORT` 환경 변수를 자동으로 감지하여 바인딩합니다.
 
 ---
 
