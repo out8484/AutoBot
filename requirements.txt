@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+netmiko
+ping3
+scapy
+python-multipart
+junos-eznc==2.7.5

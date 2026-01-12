@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autobot | Network Automation Engine</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js" crossorigin="anonymous"></script>
+    <!-- Simple icon fallback if FA is not loaded -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span>AUTOBOT</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-view="ip-scan">
+                    <i class="fas fa-search-location"></i>
+                    <span>IP Scan</span>
+                </a>
+                <a href="#" class="nav-item" data-view="config-push">
+                    <i class="fas fa-terminal"></i>
+                    <span>Config Push</span>
+                </a>
+                <a href="#" class="nav-item" data-view="credentials">
+                    <i class="fas fa-key"></i>
+                    <span>Credentials</span>
+                </a>
+                <a href="#" class="nav-item" data-view="logs">
+                    <i class="fas fa-file-alt"></i>
+                    <span>History Logs</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="status-indicator">
+                    <span class="pulse green"></span>
+                    <span>Engine Online</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="top-bar">
+                <h1 id="view-title">Dashboard</h1>
+                <div class="user-profile">
+                    <span class="time-display" id="current-time">00:00:00</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <div class="content-area">
+                <!-- Dashboard View -->
+                <section id="dashboard-view" class="view">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue"><i class="fas fa-network-wired"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Total Scanned</span>
+                                <span class="stat-value" id="total-scanned">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Active IPs</span>
+                                <span class="stat-value" id="active-ips">0</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon orange"><i class="fas fa-bolt"></i></div>
+                            <div class="stat-info">
+                                <span class="stat-label">Available IPs</span>
+                                <span class="stat-value" id="available-ips">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="inventory-section">
+                        <div class="section-header">
+                            <h2>Recent Available IPs</h2>
+                            <button class="btn secondary" id="refresh-dashboard">Refresh</button>
+                        </div>
+                        <div class="table-container">
+                            <table id="available-ips-table">
+                                <thead>
+                                    <tr>
+                                        <th>IP Address</th>
+                                        <th>Last Check</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="available-ips-body">
+                                    <!-- Data will be injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- IP Scan View -->
+                <section id="ip-scan-view" class="view hidden">
+                    <div class="card scan-input-card">
+                        <h2>Network Scanner</h2>
+                        <div class="input-group">
+                            <label for="ip-range">IP Range / CIDR / List</label>
+                            <input type="text" id="ip-range" placeholder="e.g. 172.27.14.0/24 or 172.27.14.0-250">
+                            <button class="btn primary" id="start-scan-btn">
+                                <i class="fas fa-play"></i> Start Scan
+                            </button>
+                        </div>
+                        <div id="scan-progress-container" class="hidden">
+                            <div class="progress-info">
+                                <span id="scan-status-text">Scanning 172.27.14.1...</span>
+                                <span id="scan-percentage">0%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="scan-bar-fill" class="progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card table-card">
+                        <div class="table-header">
+                            <h3>Scan Results</h3>
+                            <button id="download-results" class="btn outline"><i class="fas fa-download"></i>
+                                Export</button>
+                        </div>
+                        <div class="table-container">
+                            <table id="scan-results-table">
+                                <thead>
+                                    <tr>
+                                        <th>Status</th>
+                                        <th>IP Address</th>
+                                        <th>MAC Address</th>
+                                        <th>Latency</th>
+                                        <th>Open Ports</th>
+                                        <th>Timestamp</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scan-results-body">
+                                    <!-- Results injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Config Push View -->
+                <section id="config-push-view" class="view hidden">
+                    <div class="config-grid">
+                        <!-- Left: Form -->
+                        <div class="config-panel">
+                            <div class="card glass">
+                                <div class="card-header">
+                                    <i class="fas fa-network-wired"></i>
+                                    <h3>Target Definition</h3>
+                                </div>
+                                <div class="form-row-compact">
+                                    <div class="form-group">
+                                        <label>Target IP</label>
+                                        <input type="text" id="ssh-target-ip" list="target-ip-list"
+                                            placeholder="192.168.1.1">
+                                        <datalist id="target-ip-list"></datalist>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>User Group</label>
+                                        <select id="ssh-user-group">
+                                            <option value="">-- Select Group --</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-row-compact">
+                                    <div class="form-group">
+                                        <label>Username (Optional)</label>
+                                        <input type="text" id="ssh-username" placeholder="admin">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Password (Optional)</label>
+                                        <input type="password" id="ssh-password" placeholder="••••••••">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="card glass">
+                                <div class="card-header">
+                                    <i class="fas fa-terminal"></i>
+                                    <h3>Configuration Template</h3>
+                                </div>
+                                <div class="form-group">
+                                    <textarea id="ssh-commands" placeholder="Enter CLI commands here..."
+                                        class="modern-textarea">set system host-name {{hostname}}
+set system management-instance
+set routing-instances mgmt_junos routing-options static route 0.0.0.0/0 next-hop {{nexthop}}</textarea>
+                                </div>
+
+                                <div id="dynamic-vars-container" class="vars-grid">
+                                    <!-- Dynamic inputs will appear here -->
+                                </div>
+
+                                <button class="btn accent-btn pulse-btn" id="push-config-btn">
+                                    <i class="fas fa-search"></i> Preview & Deploy
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Right: Output -->
+                        <div class="config-panel">
+                            <div class="card glass terminal-panel">
+                                <div class="card-header space-between">
+                                    <div class="flex-align">
+                                        <i class="fas fa-stream"></i>
+                                        <h3>Execution Log</h3>
+                                    </div>
+                                    <button id="clear-logs" class="btn small-ghost">Clear</button>
+                                </div>
+                                <div id="terminal" class="modern-terminal">
+                                    <div class="log-entry system">Engine ready for deployment...</div>
+                                </div>
+                                <div class="card-footer">
+                                    <button id="download-logs" class="btn small-ghost"><i class="fas fa-download"></i>
+                                        Save log</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </section>
+
+                <!-- Credentials View -->
+                <section id="credentials-view" class="view hidden">
+                    <div class="card credential-form-card">
+                        <h2>Manage User Groups</h2>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Group Name</label>
+                                <input type="text" id="cred-group-name" placeholder="e.g. CORE_SWITCH">
+                            </div>
+                            <div class="form-group">
+                                <label>Username</label>
+                                <input type="text" id="cred-username" placeholder="admin">
+                            </div>
+                            <div class="form-group">
+                                <label>Password</label>
+                                <input type="password" id="cred-password" placeholder="••••••••">
+                            </div>
+                            <div class="form-group" style="align-self: flex-end;">
+                                <button class="btn primary" id="save-cred-btn">Save Group</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card table-card">
+                        <h3>Saved User Groups</h3>
+                        <div class="table-container">
+                            <table id="credentials-table">
+                                <thead>
+                                    <tr>
+                                        <th>Group Name</th>
+                                        <th>Username</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="credentials-body">
+                                    <!-- Credentials injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+    <!-- Config Preview Modal -->
+    <div id="preview-modal" class="modal hidden">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h3><i class="fas fa-eye"></i> Configuration Preview</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 15px; font-size: 0.9rem; color: var(--text-secondary);">
+                    Please review the generated configuration before committing to the device.
+                </p>
+                <pre id="config-preview-text" class="preview-box"></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn secondary" id="cancel-push">Cancel</button>
+                <button class="btn accent-btn" id="confirm-push"
+                    style="width: auto; padding: 12px 30px; font-size: 1rem; margin-top: 0;">
+                    <i class="fas fa-check-circle"></i> Commit to Device
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,49 @@
+[Prompt: Autobot - Network Automation Workflow Engine]
+
+Objective: 특정 대역의 IP를 스캔하여 미사용 IP를 식별하고, 사용자가 지정한 장비에 SSH로 접속하여 초기 설정을 자동화하는 'Autobot' 워크플로우 엔진을 개발해줘.
+
+Tech Stack: * Backend: Python (scapy 또는 ping3 라이브러리 활용)
+
+Networking: Paramiko 또는 Netmiko (SSH 연결용)
+
+Frontend/UI: 사용자가 직관적으로 조작할 수 있는 Dashboard 형태
+
+Key Functionalities:
+
+IP Scan Module:
+
+입력창에 IP Prefix 범위(예: 172.27.14.0/24 또는 172.27.14.0-250 또는 개별 IP인 172.27.14.100,200)를 받으면 전체 스캔을 수행해.
+
+ICMP Ping 스캔으로 생존 여부를 확인하고, 주요 포트(22, 80, 443 등)에 대해 소켓 스캔을 병행해줘.
+
+결과값으로 IP 주소와 대응하는 MAC 주소 테이블을 생성해.
+
+Inventory & Visualization:
+
+스캔 결과를 테이블로 보여주고, '사용 중(Active)'과 '미사용(Available)' IP를 명확히 구분해줘.
+
+미사용 중인 IP들만 따로 모아서 리스트업해주는 섹션을 만들어줘.
+
+Configuration Push (SSH):
+
+사용자가 '미사용 IP' 중 하나를 선택하거나 수동으로 입력할 수 있게 해.
+
+Config Input Box: 네트워크 스위치에 적용할 명령어(CLI)를 자유롭게 입력할 수 있는 Multi-line 텍스트 박스를 제공해.
+
+접속 정보(ID, PW, Target IP)를 입력하면 해당 장비에 SSH로 접속하여 설정을 순차적으로 주입해.
+
+Verification:
+
+설정 주입이 끝나면 show run 또는 사용자가 지정한 검증 명령어를 실행하여 그 결과를 로그창에 실시간으로 출력해줘.
+
+UI/UX Requirement:
+
+진행 상태를 알 수 있는 Progress Bar를 넣어줘.
+
+모든 작업 로그는 텍스트 파일로 저장하거나 화면에서 다운로드할 수 있어야 해.
+
+
+에러 핸들링: 네트워크 장비는 응답이 늦을 수 있습니다. "SSH 타임아웃 처리를 꼼꼼하게 해주고, 접속 실패 시 에러 메시지를 명확히 띄워줘"라는 요구사항을 추가하면 안정성이 올라갑니다.
+
+보안: "Password는 별도의 비밀번호 입력창(Masking 처리)을 통해 받아줘"라고 요청하세요.
+
